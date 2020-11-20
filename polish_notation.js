@@ -17,6 +17,10 @@ const MATH_OPERATION_PRIORITY = {
  */
 const isMathOperation = (item) => {
     switch (item) {
+        case 'sin':
+            return true
+        case 'cos':
+            return true
         case '/':
             return true
         case '*':
@@ -39,6 +43,15 @@ const notBrackets = (item) => {
 const isNumber = (item) => {
     return !isMathOperation(item) && !isBrackets(item)
 }
+
+const isLetter = (item) => {
+    return /[A-Za-z]/.test(item)
+}
+
+const isCommas = (item) => {
+    return item === ','
+}
+
 /**
  * depend of math operation -> do math action
  * @param operation
@@ -145,6 +158,54 @@ const transformExpressionByReversedPolandNotation = (expr) => {
 
     return current
 }
+
+const transformExpressionByReversedPolandNotation2 = (expr) => {
+    let equation = expr.split(' ')
+    let current = [], stack = []
+    for (let i = 0; i < equation.length; i++) {
+        let item = equation[i]
+        if (isNumber(item)) {
+            current.push(item)
+        } else if (isLetter(item)) {
+            current.push(item)
+            //todo
+        }
+        else {
+            if (item === '(') {
+                stack.push(item)
+            } else if (item === ')') {
+                while (stack[stack.length - 1] !== '(') {
+                    current.push(stack.pop())
+                }
+                stack.pop()
+                // todo add [ and ] for array
+            }else if (item === '['){
+                //todo
+            } else if (item === ']'){
+                //todo
+            }else if (item === ','){
+                //todo
+            }else if (stack.length === 0) {
+                stack.push(item)
+            } else if (MATH_OPERATION_PRIORITY[item] > MATH_OPERATION_PRIORITY[stack[stack.length - 1]]) {
+                stack.push(item)
+            } else if (MATH_OPERATION_PRIORITY[item] === MATH_OPERATION_PRIORITY[stack[stack.length - 1]]) {
+                current.push(stack.pop())
+                stack.push(item)
+            } else if (MATH_OPERATION_PRIORITY[item] < MATH_OPERATION_PRIORITY[stack[stack.length - 1]]) {
+                while (MATH_OPERATION_PRIORITY[item] <= MATH_OPERATION_PRIORITY[stack[stack.length - 1]]) {
+                    current.push(stack.pop())
+                }
+                stack.push(item)
+            }
+        }
+    }
+    while (stack.length > 0)
+        current.push(stack.pop())
+
+    return current
+}
+
 /**
  * using current list (with RPN - reversed poland notation)
  * to calculate value by special math string
@@ -188,7 +249,7 @@ function expressionCalculator(expr) {
     return answer
 }
 
-console.log(expressionCalculator('56 * sin ( 1 + 1 )'))
+console.log(expressionCalculator('56 * , sin ( 90 )'))
 
 
 /*

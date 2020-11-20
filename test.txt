@@ -1,0 +1,7 @@
+1 + sin ( 90 )
+stack
+
+output
+1,90,sin,+
+
+
