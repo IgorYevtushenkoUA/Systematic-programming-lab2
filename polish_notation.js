@@ -1,5 +1,7 @@
 import {checkBrackets} from "./brackets.js";
 
+let lastOperationSinOrCos = false
+
 const MATH_OPERATION_PRIORITY = {
     'sin': 5,
     'cos': 5,
@@ -10,6 +12,8 @@ const MATH_OPERATION_PRIORITY = {
     '+': 2,
     '(': 1,
     ')': 1,
+    '[': 1,
+    ']': 1,
 }
 
 /***
@@ -44,7 +48,10 @@ const notBrackets = (item) => {
 }
 
 const isNumber = (item) => {
-    return !isMathOperation(item) && !isBrackets(item)
+    return !isMathOperation(item)
+        && !isBrackets(item)
+        && !/[A-Za-z]/.test(item)
+        && item !== ','
 }
 
 const isLetter = (item) => {
@@ -136,9 +143,16 @@ const transformExpressionByReversedPolandNotation = (expr) => {
     let current = [], stack = []
     for (let i = 0; i < equation.length; i++) {
         let item = equation[i]
+
+        if (isMathOperation(item) && (item === 'sin' || item === 'cos') ){
+            lastOperationSinOrCos = true
+        }else if (isMathOperation(item) && (item !== 'sin' && item !== 'cos')) {
+            lastOperationSinOrCos = false
+        }
+
         if (isNumber(item)) {
             current.push(item)
-        } else if (item !== 'sin' && item != 'cos' && isLetter(item)) {
+        } else if (!isNumber(item) && isLetter(item)) {
             current.push(item)
             //todo
         } else {
@@ -149,12 +163,30 @@ const transformExpressionByReversedPolandNotation = (expr) => {
                     current.push(stack.pop())
                 }
                 stack.pop()
+                if (lastOperationSinOrCos){
+                    current.push("2FN")
+                }
                 // todo add [ and ] for array
             } else if (item === '[') {
-                //todo
+                stack.push("2")
+                stack.push(item)
             } else if (item === ']') {
-                //todo
+                while (stack[stack.length - 1] !== '[') {
+                    current.push(stack.pop())
+                }
+                stack.pop()
+                current.push(stack.pop())
+                current.push(']')
+
             } else if (item === ',') {
+                let stackCopy = stack.slice(0)
+                while (Number.isNaN(parseInt(stackCopy[stackCopy.length - 1]))) {
+                    stackCopy.pop()
+                }
+                stack[stackCopy.length-1] = 1 + parseInt(stack[stackCopy.length-1])
+
+                while (stack[stack.length - 1] !== '[')
+                    current.push(stack.pop())
                 //todo
             } else if (stack.length === 0) {
                 stack.push(item)
@@ -219,13 +251,14 @@ function expressionCalculator(expr) {
 
         expr = normalizeExpression(expr)
         let current = transformExpressionByReversedPolandNotation(expr)
-        let answer = arithmeticExpresion ? transformReversedPolandNotationToValue(current) : "CON NOT COUNT"
+        let answer = arithmeticExpresion ? transformReversedPolandNotationToValue(current) : current.join(" ")
         return answer
     } catch (e) {
-        return("ERROR incorrect data")
+        return ("ERROR incorrect data")
     }
 
 
 }
 
-console.log(expressionCalculator('5 [ ] ^ 2'));
+console.log(expressionCalculator('M * [ 8 , i - 4 , cos ( A ) , k * 4 ] ^ 6'));
+// console.log(expressionCalculator(' 1 - 1'));

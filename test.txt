@@ -1,4 +1,6 @@
 1 + sin ( 90 )
+M [ 8 , i - 4 , cos ( A ) , k * 4 ] ^ 6
+
 stack
 
 output
