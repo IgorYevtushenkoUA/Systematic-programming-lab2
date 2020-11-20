@@ -23,8 +23,9 @@ const isBracketsCouple = (bracketsOpen, bracketsClose, bracketsConfig) => {
 
 }
 
-function check(str, bracketsConfig) {
-    let bracketsQueue = []
+export function checkBrackets(str) {
+    let bracketsQueue = [],
+        bracketsConfig = [['(', ')'], ['[', ']'], ['{', '}']]
 
     for (let i = 0; i < str.length; i++) {
         if (bracketsQueue.length > 0 && str.charAt(i) === '|' && bracketsQueue[bracketsQueue.length - 1] === '|') {
@@ -39,5 +40,3 @@ function check(str, bracketsConfig) {
     }
     return bracketsQueue.length === 0
 }
-
-console.log(check('([[][][][]])', [['(', ')'], ['[', ']'], ['{', '}']]));
