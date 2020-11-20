@@ -243,7 +243,7 @@ function isArithmeticType(expr) {
     return comas || closeBrackets || openBrackets || letters
 }
 
-function expressionCalculator(expr) {
+export function expressionCalculator(expr) {
     try {
         checkForError(expr)
 
