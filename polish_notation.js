@@ -1,7 +1,7 @@
 import {checkBrackets} from "./brackets.js";
 
-let lastOperationSinOrCos = false
-
+let lastOperationSinOrCos = false,
+    arithmeticExpresion = false
 const MATH_OPERATION_PRIORITY = {
     'sin': 5,
     'cos': 5,
@@ -52,6 +52,8 @@ const isNumber = (item) => {
         && !isBrackets(item)
         && !/[A-Za-z]/.test(item)
         && item !== ','
+        && item !=='sin'
+        && item !== 'cos'
 }
 
 const isLetter = (item) => {
@@ -152,7 +154,7 @@ const transformExpressionByReversedPolandNotation = (expr) => {
 
         if (isNumber(item)) {
             current.push(item)
-        } else if (!isNumber(item) && isLetter(item)) {
+        } else if (!isNumber(item) && item!=='sin' && item!== 'cos' && isLetter(item)) {
             current.push(item)
             //todo
         } else {
@@ -163,7 +165,7 @@ const transformExpressionByReversedPolandNotation = (expr) => {
                     current.push(stack.pop())
                 }
                 stack.pop()
-                if (lastOperationSinOrCos){
+                if (lastOperationSinOrCos && !arithmeticExpresion){
                     current.push("2FN")
                 }
                 // todo add [ and ] for array
@@ -223,9 +225,9 @@ const transformReversedPolandNotationToValue = (current) => {
             answer.push(item)
         } else {
             let y = parseFloat(answer.pop())
-            let x = parseFloat(answer.pop())
+            let x = answer.length > 0 ? parseFloat(answer.pop()) : undefined
             let res = doOperation(item, x, y)
-            if (item === 'cos' || item === 'sin')
+            if (item === 'cos' || item === 'sin' && x !== undefined)
                 answer.push(x)
             answer.push(res)
         }
@@ -247,7 +249,7 @@ export function expressionCalculator(expr) {
     try {
         checkForError(expr)
 
-        let arithmeticExpresion = !isArithmeticType(expr) // to know count or not
+        arithmeticExpresion = !isArithmeticType(expr) // to know count or not
 
         expr = normalizeExpression(expr)
         let current = transformExpressionByReversedPolandNotation(expr)
@@ -260,5 +262,5 @@ export function expressionCalculator(expr) {
 
 }
 
-console.log(expressionCalculator('M * [ 8 , i - 4 , cos ( A ) , k * 4 ] ^ 6'));
+// console.log(expressionCalculator('M * [ 8 , i - 4 , cos ( A ) , k * 4 ] ^ 6'));
 // console.log(expressionCalculator(' 1 - 1'));
