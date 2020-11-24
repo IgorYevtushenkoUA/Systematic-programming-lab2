@@ -232,7 +232,11 @@ const transformReversedPolandNotationToValue = (current) => {
                 console.log(`${res}, ${item}(${y})`)
 
             } else {
-                console.log(`${res}, ${x}${item}${y}`)
+                if (x != undefined)
+                    console.log(`${res}, ${x}${item}${y}`)
+                else
+                    console.log(`${res}, ${item}${y}`)
+
             }
             answer.push(res)
         }
